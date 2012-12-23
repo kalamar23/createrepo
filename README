@@ -1,4 +1,5 @@
-Create repo in Github from Command Line
+Create repo in Github from command line
+========================
 
 With this script you can create a new repository in github from command line, how do this ? the script use the API of Github.
 
