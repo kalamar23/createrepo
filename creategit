@@ -1,0 +1,47 @@
+#!/bin/bash
+# script para crear repositorios desde cli en github by @kbaudio
+
+echo -e "\e[00;32mCon este simple script puedes crear un nuevo repositorio en Github\e[00m"
+
+
+if [ ! -d /tmp/token ]; then
+
+echo -e -n "\e[00;32mIngresa nombre de usuario github :\e[00m"
+read nom	
+	
+mkdir /tmp/token	
+curl -u "$nom" -d '{"scopes":["repo"],"note":"create repo by @kbaudio"}' \
+    https://api.github.com/authorizations > /tmp/token/token
+
+    #detecta datos de cuenta erronea 
+error=`cat /tmp/token/token | cut -d":" -f2 | grep Bad | sed -e 's/"//g'| sed -e 's/ //g'`
+
+if [ "$error" == Badcredentials ]; then
+	echo -e "\e[00;32mEl usuario o contraseña no son correctos\e[00m"
+	rm -r /tmp/token
+	exit
+fi
+
+echo "$nom" > /tmp/token/usuario
+fi
+token2=`cat /tmp/token/token | grep token | cut -d":" -f2 | sed -e 's/[",]//g'| sed -e 's/ //g'` 
+echo -e -n "\e[00;32mNombre del nuevo repositorio :\e[00m"
+read repo
+echo -e -n "\e[00;32mDescripción del repositorio :\e[00m"
+read des
+
+if [ -z "$repo" ] || [ -z "$des" ]; then
+	exit
+fi
+
+#auto="'Authorization: token $token2'"
+comando="curl -XPOST -H 'Authorization: token $token2' https://api.github.com/user/repos -d '{"\"name"\":"\"$repo"\","\"description"\":"\"$des"\"}'"
+eval $comando > /dev/null
+user=`cat /tmp/token/usuario`
+echo -e "\e[00;32mSu nuevo repositorio es : https://github.com/$user/$repo.git\e[00m"
+
+
+
+
+
+
